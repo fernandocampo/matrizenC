@@ -1,0 +1,80 @@
+
+# include < stdio.h > #include < stdlib.h > #include < assert.h > #include < limits.h >
+  // struct para guardar la rta, min , max values , arreglo y tu tamano
+  typedef struct {
+    int inferior, superior, cantidad_elementos;
+    int * arr;
+  }
+res_t;
+// rutina (funcion) la cual resuelve el problema
+res_t solve(int N, int * * A) {
+    res_t res;
+    res.cantidad_elementos = 0;
+    res.arr = malloc(sizeof(int) * (N * N / 2 + 1));
+    assert(res.arr != NULL && "error al colocar en memoria!");
+    int i, j, sum = 0, max = INT_MIN, min = INT_MAX;
+    for (i = 0; i < N; i++)
+      sum += A[i][i];
+    // recorro todos los elementos
+    for (i = 0; i < N; i++) {
+      for (j = 0; j < N; j++) {
+        if (i <= j) { // estamos en la parte arriba de la matriz
+          if (A[i][j] > max) // actaulizo el max valor
+            max = A[i][j];
+          if (A[i][j] > sum) // agrego al arreglo si es requerido
+            res.arr[res.cantidad_elementos++] = A[i][j];
+        } else { // estamos en la parte de abajo de la matriz
+          if (A[i][j] < min) // actualizo el minimo valor de la inferior
+            min = A[i][j];
+        }
+      }
+    }
+    res.inferior = min;
+    res.superior = max;
+    // libero elementos
+    if (res.cantidad_elementos == 0)
+      free(res.arr);
+    else {
+      res.arr = realloc(res.arr, sizeof(int) * res.cantidad_elementos);
+      assert(res.arr != NULL && "Error al achicar arreglo!");
+    }
+    return res;
+  }
+  // funcion principal corre demo de la rutina
+int main() {
+    int N, i, j;
+    printf("Ingresa el tamano de la matriz: ");
+    scanf("%d", & N);
+    if (N < 2) {
+      printf("Error, la matriz tiene que ser CUADRADA!\n"); //precondicion
+      del ej en enunciado //
+      exit(1);
+    }
+    // aca asigno espacio para la matriz
+    int * * A = (int * * ) malloc(sizeof(int * ) * N);
+    // uso asserts para chequear si la asignacion fue exitosa
+    assert(A != NULL && "error!");
+    for (i = 0; i < N; i++) {
+      A[i] = malloc(sizeof(int) * N);
+      assert(A[i] != NULL && "error");
+    }
+    printf("Ingresa los elementos de la matriz:\n");
+    for (i = 0; i < N; i++)
+      for (j = 0; j < N; j++)
+        scanf("%d", & A[i][j]);
+    res_t res = solve(N, A);
+    free(A); // no necesitamos mas memoria para la matriz en si misma
+    printf("Arreglo que contiene los elementos de la tringular superior de
+      la matriz mayores que la suma de los elementos de la diagonal principal es ");
+      if (res.cantidad_elementos == 0)
+        printf("Esta vacio!");
+      else {
+        for (i = 0; i < res.cantidad_elementos; i++)
+          printf("%d ", res.arr[i]);
+        free(res.arr); // no me tengo que olvidar que dar el arreglo
+      }
+      printf("\nEl elemento maximo de la triangular superior es: %d\nEl
+        elemento minimo de la triangular inferior es: % d\ n ", res.superior,
+        res.inferior);
+      return 0;
+    }
